@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using ClassLibrary1; 
+using ClassLibrary1;
 
 namespace Business_Logic
 {
@@ -14,19 +14,10 @@ namespace Business_Logic
             }
         }
 
-        public static List<Guest> GetGuestList()
-        {
-            return GuestDataService.GetAllGuests();
-        }
+        public static List<Guest> GetGuestList() => GuestDataService.GetAllGuests();
 
-        public static bool RemoveGuest(string name)
-        {
-            return GuestDataService.DeleteGuest(name);
-        }
+        public static bool RemoveGuest(string name) => GuestDataService.DeleteGuest(name);
 
-        public static Guest SearchGuest(string name)
-        {
-            return GuestDataService.FindGuest(name);
-        }
+        public static Guest SearchGuest(string name) => GuestDataService.FindGuest(name);
     }
 }

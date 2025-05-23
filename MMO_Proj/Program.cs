@@ -1,6 +1,4 @@
-﻿
-using System;
-using ClassLibrary1;  
+﻿using System;
 using System.Collections.Generic;
 using Business_Logic;
 
@@ -8,9 +6,19 @@ namespace MMOGuestManager
 {
     internal class Program
     {
+        // Allowed MMO member names lang dito, hindi sila auto-registered.
+        static readonly List<string> dummyNames = new List<string>()
+        {
+            "Barney Ross", "Lee Christmas", "Gunner Jensen", "Yin Yang", "Toll Road",
+            "Hale Caesar", "Gustavo Hernandez", "Galan Galgo", "Sammy Collins", "Trench Mauser"
+            //Just a few names that i get from a movie,,
+            //i cant think of any specific names that sounds manly except for this ... :((
+        };
+
         static void Main()
         {
             Console.WriteLine("Millionaire Minds Org Guest Event:");
+            // Hindi muna ireregistered if indi part ng Org
 
             while (true)
             {
@@ -66,15 +74,31 @@ namespace MMOGuestManager
         {
             Console.Write("Enter guest name: ");
             string guestName = Console.ReadLine();
-            if (!string.IsNullOrWhiteSpace(guestName))
+
+            if (string.IsNullOrWhiteSpace(guestName))
+            {
+                Console.WriteLine("Invalid name. Please try again.");
+                return;
+            }
+
+            // Check if guest is allowed member
+            bool isAllowed = dummyNames.Exists(name => name.Equals(guestName, StringComparison.OrdinalIgnoreCase));
+            if (!isAllowed)
+            {
+                Console.WriteLine("Error: Guest name not recognized as MMO member. Registration denied.");
+                return;
+            }
+
+            // Check if guest already registered
+            if (!DATAPROCESSING.GetGuestList().Exists(g => g.Name.Equals(guestName, StringComparison.OrdinalIgnoreCase)))
             {
                 DATAPROCESSING.RegisterGuest(guestName);
                 string timeOfArrival = DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt");
                 Console.WriteLine($"Guest '{guestName}' Registered! Time of Arrival: {timeOfArrival}");
-            }//Registered Action of the System 
+            }
             else
             {
-                Console.WriteLine("Invalid name. Please try again.");
+                Console.WriteLine("Guest already registered.");
             }
         }
 
@@ -90,7 +114,7 @@ namespace MMOGuestManager
             {
                 foreach (var guest in guests)
                 {
-                    Console.WriteLine(guest.ToString());  //Viewing Action of the System
+                    Console.WriteLine(guest.ToString());
                 }
             }
         }
@@ -99,6 +123,7 @@ namespace MMOGuestManager
         {
             Console.Write("Enter guest name to remove: ");
             string nameToRemove = Console.ReadLine();
+
             if (DATAPROCESSING.RemoveGuest(nameToRemove))
             {
                 string timeOfExit = DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt");
@@ -114,10 +139,10 @@ namespace MMOGuestManager
         {
             Console.Write("Enter guest name to search: ");
             string nameToSearch = Console.ReadLine();
+
             var guest = DATAPROCESSING.SearchGuest(nameToSearch);
-            //Searching Action of the System
-            if (guest != null)//Also yung Searching action is used to find and check is ang isang 
-                              //sa naturang program ay nandoon pa or wala na sya.
+
+            if (guest != null)
             {
                 Console.WriteLine($"Guest found: {guest.ToString()}");
             }

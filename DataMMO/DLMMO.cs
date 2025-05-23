@@ -1,42 +1,68 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
+using ClassLibrary1;
 
-namespace ClassLibrary1
+namespace DataLayer
 {
-    public static class GuestDataService 
+    public class GuestDataService
     {
-        private static List<Guest> guests = new List<Guest>();
+        private readonly string jsonFilePath = "guestData.json";
+        private readonly string textFilePath = "guestData.txt";
+        private List<Guest> guests = new();
 
-        public static void AddGuest(Guest guest)
+        public GuestDataService()
         {
-            guests.Add(guest);
+            LoadGuestsFromJson();
         }
 
-        public static bool DeleteGuest(string name)
+        private void LoadGuestsFromJson()
+        {
+            if (File.Exists(jsonFilePath))
+            {
+                string jsonData = File.ReadAllText(jsonFilePath);
+                guests = JsonSerializer.Deserialize<List<Guest>>(jsonData) ?? new List<Guest>();
+            }
+        }
+
+        private void SaveGuestsToJson()
+        {
+            string jsonData = JsonSerializer.Serialize(guests, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(jsonFilePath, jsonData);
+        }
+
+        private void SaveGuestsToTextFile()
+        {
+            File.WriteAllLines(textFilePath, guests.Select(g => g.Name));
+        }
+
+        public void AddGuest(Guest guest)
+        {
+            if (!Exists(guest.Name))
+            {
+                guests.Add(guest);
+                SaveGuestsToJson();
+                SaveGuestsToTextFile();
+            }
+        }
+
+        public bool RemoveGuest(string name)
         {
             var guest = guests.FirstOrDefault(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
             if (guest != null)
             {
                 guests.Remove(guest);
+                SaveGuestsToJson();
+                SaveGuestsToTextFile();
                 return true;
             }
             return false;
         }
 
-        public static List<Guest> GetAllGuests()
-        {
-            return new List<Guest>(guests);
-        }
-
-        public static Guest FindGuest(string name)
-        {
-            return guests.FirstOrDefault(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public static bool Exists(string name)
-        {
-            return guests.Any(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        }
+        public List<Guest> GetAllGuests() => new List<Guest>(guests);
+        public Guest FindGuest(string name) => guests.FirstOrDefault(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        public bool Exists(string name) => guests.Any(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
     }
 }
