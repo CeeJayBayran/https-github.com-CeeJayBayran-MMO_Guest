@@ -1,67 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-
-namespace ClassLibrary1
+using ClassLibrary1;
+                           // Malaking ipikto sa buston siltiks ang pagkawala ni jison titum //
+namespace DataLayer
 {
-    public static class GuestDataService
+    public class GuestDataService  // This is my Json Part po hehhhehe//
     {
-        private static List<Guest> guests = new List<Guest>();
-        private static readonly string jsonFilePath = "guestData.json";
+        private readonly string jsonFilePath = "guestData.json";
+        private List<Guest> guests = new();
 
-        static GuestDataService()
+        public void LogGuest(Guest guest)
         {
-            LoadGuestsFromJson();
+            LoadFromFile();
+            guests.Add(guest);
+            SaveToFile();
         }
 
-        private static void LoadGuestsFromJson()
+        private void LoadFromFile()
         {
             if (File.Exists(jsonFilePath))
             {
-                string jsonData = File.ReadAllText(jsonFilePath);
-                guests = JsonSerializer.Deserialize<List<Guest>>(jsonData) ?? new List<Guest>();
+                var json = File.ReadAllText(jsonFilePath);
+                guests = JsonSerializer.Deserialize<List<Guest>>(json) ?? new();
             }
         }
-
-        private static void SaveGuestsToJson()
+        public void LogExit(Guest guest)
         {
-            string jsonData = JsonSerializer.Serialize(guests, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(jsonFilePath, jsonData);
-        }
-
-        public static void AddGuest(Guest guest)
-        {
-            guests.Add(guest);
-            SaveGuestsToJson();
-        }
-
-        public static bool DeleteGuest(string name)
-        {
-            var guest = guests.FirstOrDefault(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-            if (guest != null)
+            LoadFromFile();
+            guests.Add(new Guest(guest.Name, guest.Role)
             {
-                guests.Remove(guest);
-                SaveGuestsToJson();
-                return true;
-            }
-            return false;
+                TimeIn = guest.TimeIn, //Time In Time Out
+                TimeOut = guest.TimeOut
+            });
+            SaveToFile();
         }
 
-        public static List<Guest> GetAllGuests()
+        private void SaveToFile()
         {
-            return new List<Guest>(guests);
-        }
-
-        public static Guest FindGuest(string name)
-        {
-            return guests.FirstOrDefault(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public static bool Exists(string name)
-        {
-            return guests.Any(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            var json = JsonSerializer.Serialize(guests, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(jsonFilePath, json);
         }
     }
 }

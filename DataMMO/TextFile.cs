@@ -1,66 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using ClassLibrary1;
 
-namespace ClassLibrary1
+namespace DataLayer
 {
-    public static class GuestTextFileService
+    public class GuestTextFileService  //  The TextFile part po ehhehhehhe//
     {
-        private static readonly string textFilePath = "";
-        private static List<Guest> guests = new List<Guest>();
+        private readonly string textFilePath = "guestLog.txt";
 
-        static GuestTextFileService()
+        public void LogGuest(Guest guest)
         {
-            LoadGuestsFromTextFile();
+            var line = $"{guest.Name} - {guest.Role} entered at {guest.TimeIn}";
+            File.AppendAllLines(textFilePath, new[] { line });
+        }
+        public void LogExit(Guest guest)
+        {
+            var line = $"{guest.Name} - {guest.Role} exited at {guest.TimeOut}";
+            File.AppendAllLines(textFilePath, new[] { line });
         }
 
-        private static void LoadGuestsFromTextFile()
-        {
-            if (File.Exists(textFilePath))
-            {
-                var lines = File.ReadAllLines(textFilePath);
-                guests = lines.Select(line => new Guest(line)).ToList();
-            }
-        }
-
-        private static void SaveGuestsToTextFile()
-        {
-            var lines = guests.Select(g => g.Name).ToArray();
-            File.WriteAllLines(textFilePath, lines);
-        }
-
-        public static void AddGuest(Guest guest)
-        {
-            guests.Add(guest);
-            SaveGuestsToTextFile();
-        }
-
-        public static bool DeleteGuest(string name)
-        {
-            var guest = guests.FirstOrDefault(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-            if (guest != null)
-            {
-                guests.Remove(guest);
-                SaveGuestsToTextFile();
-                return true;
-            }
-            return false;
-        }
-
-        public static List<Guest> GetAllGuests()
-        {
-            return new List<Guest>(guests);
-        }
-
-        public static Guest FindGuest(string name)
-        {
-            return guests.FirstOrDefault(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public static bool Exists(string name)
-        {
-            return guests.Any(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        }
     }
 }

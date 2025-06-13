@@ -7,37 +7,53 @@ namespace DataLayer
 {
     public class InMemoryGuestStorage
     {
-        private readonly List<Guest> guests = new List<Guest>(); 
-
-        public void AddGuest(Guest guest)
+        private readonly List<Guest> allowedGuests = new()
         {
-            guests.Add(guest);
-        }
+            new Guest("Trench Mauser", "MMO Member!"),
+            new Guest("Sammy Collins", "MMO Member!"),
+            new Guest("Galan Galgo", "MMO Member!"), //Fun Fact this was a bunch of Characters po from a movie
+            new Guest("Gustavo Hernandez", "MMO Member!"),
+            new Guest("Hale Caesar", "MMO Member!"),
+            new Guest("Toll Road", "MMO Member!"),
+            new Guest("Yin Yang", "MMO Member!"),
+            new Guest("Gunner Jensen", "MMO Member!"),
+            new Guest("Lee Christmas", "MMO Member!"),
+            new Guest("Barney Ross", "MMO Member!")
+        };
 
-        public bool RemoveGuest(string name)
+        private readonly List<Guest> currentGuests = new();
+
+        public bool AddGuest(string name)
         {
-            var guest = guests.FirstOrDefault(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-            if (guest != null)
+            var allowed = allowedGuests.FirstOrDefault(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            if (allowed != null && !Exists(name))
             {
-                guests.Remove(guest);
+                var newGuest = new Guest(allowed.Name, allowed.Role);
+                currentGuests.Add(newGuest);
                 return true;
             }
             return false;
         }
 
-        public List<Guest> GetAllGuests()
+        public bool RemoveGuest(string name)
         {
-            return new List<Guest>(guests); 
+            var guest = currentGuests.FirstOrDefault(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            if (guest != null)
+            {
+                guest.TimeOut = DateTime.Now; // ← Mark exit time
+                currentGuests.Remove(guest);
+                return true;
+            }
+            return false;
         }
 
-        public Guest FindGuest(string name)
-        {
-            return guests.FirstOrDefault(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        }
 
-        public bool Exists(string name)
-        {
-            return guests.Any(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        }
+        public Guest FindGuest(string name) =>
+            currentGuests.FirstOrDefault(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+        public List<Guest> GetAllGuests() => new(currentGuests);
+
+        public bool Exists(string name) =>
+            currentGuests.Any(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
     }
 }

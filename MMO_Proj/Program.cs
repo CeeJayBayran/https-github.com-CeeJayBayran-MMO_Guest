@@ -1,170 +1,68 @@
 ﻿using System;
-using System.Collections.Generic;
 using Business_Logic;
+using ClassLibrary1;
 
-namespace MMOGuestManager
+class Program
 {
-    internal class Program
+    static void Main()
     {
-        // Allowed MMO member names lang dito, hindi sila auto-registered.
-        static readonly List<string> dummyNames = new List<string>()
+        var system = new BLMMO();
+        string choice;
+
+        do
         {
-            "Barney Ross", "Lee Christmas", "Gunner Jensen", "Yin Yang", "Toll Road",
-            "Hale Caesar", "Gustavo Hernandez", "Galan Galgo", "Sammy Collins", "Trench Mauser"
-            //Just a few names that i get from a movie,,
-            //i cant think of any specific names that sounds manly except for this ... :((
-        };
-
-        static void Main()
-        {
-            Console.WriteLine("Millionaire Minds Org Guest Event:");
-            // Hindi muna ireregistered if indi part ng Org
-
-            while (true)
-            {
-                ListActions();
-                int userInput = CollectUserInput();
-
-                switch (userInput)
-                {
-                    case 1:
-                        RegisterGuestUI();
-                        break;
-                    case 2:
-                        ViewGuestsUI();
-                        break;
-                    case 3:
-                        RemoveGuestUI();
-                        break;
-                    case 4:
-                        SearchGuestUI();
-                        break;
-                    case 5:
-                        Exit();
-                        return;
-                    default:
-                        Console.WriteLine("Invalid option. Please try again.");
-                        break;
-                }
-            }
-        }
-
-        static void ListActions()
-        {
-            Console.WriteLine("-------------------");
-            Console.WriteLine("GUEST MMO MENU");
+            // This Section was for the actions!!! :)
+            Console.WriteLine("\n=== MILLIONAIRE MINDS ORGRANIZATION ===");
             Console.WriteLine("[1] Register Guest");
-            Console.WriteLine("[2] View Guest List");
-            Console.WriteLine("[3] Remove Guest");
-            Console.WriteLine("[4] Search Guest");
-            Console.WriteLine("[5] Exit");
-        }
+            Console.WriteLine("[2] View All Guests");
+            Console.WriteLine("[3] Search Guest");
+            Console.WriteLine("[4] Exit Guest");
+            Console.WriteLine("[0] Quit");
+            Console.Write("Select: ");
+            choice = Console.ReadLine();
 
-        static int CollectUserInput()
-        {
-            Console.Write("Enter Action: ");
-            if (int.TryParse(Console.ReadLine(), out int userInput))
-            {
-                return userInput;
-            }
-            return 0;
-        }
+            //Now Here is the Switch Statement for the actions !!!!
 
-        static void RegisterGuestUI()
-        {
-            Console.Write("Enter guest name: ");
-            string guestName = Console.ReadLine();
+            switch (choice)
+            {
+                case "1":
+                    Console.Write("Enter Name: ");
+                    string name = Console.ReadLine();
+                    if (system.Register(name))
+                        Console.WriteLine($": {name} registered.");
+                    else
+                        Console.WriteLine($" (x) Unauthorized or already registered.");
+                    break;
 
-            if (string.IsNullOrWhiteSpace(guestName))
-            {
-                Console.WriteLine("Invalid name. Please try again.");
-                return;
+                case "2":
+                    Console.WriteLine("Current Guests:");
+                    foreach (var guest in system.AllGuests())
+                        Console.WriteLine($"  > {guest}");
+                    break;
+
+                case "3":
+                    Console.Write("Search Name: ");
+                    string search = Console.ReadLine();
+                    var result = system.Search(search);
+                    Console.WriteLine(result != null ? $"[/] {result}" : "!! Guest not found.!!");
+                    break;
+
+                case "4":
+                    Console.Write("Exit Guest Name: ");
+                    string exit = Console.ReadLine();
+                    Console.WriteLine(system.Exit(exit) ? $"[-] {exit} exited." : "!! Guest not found.!!");
+                    break;
+
+                case "0":
+                    Console.WriteLine("Exiting system...");
+                    break;
+
+                default:
+                    Console.WriteLine("!! Invalid option.");
+                    break;
             }
 
-            // Check if guest is allowed member
-            bool isAllowed = dummyNames.Exists(name => name.Equals(guestName, StringComparison.OrdinalIgnoreCase));
-            if (!isAllowed)
-            {
-                Console.WriteLine("Error: Guest name not recognized as MMO member. Registration denied.");
-                return;
-            }
-
-            // Check if guest already registered
-            if (!DATAPROCESSING.GetGuestList().Exists(g => g.Name.Equals(guestName, StringComparison.OrdinalIgnoreCase)))
-            {
-                DATAPROCESSING.RegisterGuest(guestName);
-                string timeOfArrival = DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt");
-                Console.WriteLine($"Guest '{guestName}' Registered! Time of Arrival: {timeOfArrival}");
-            }
-            else
-            {
-                Console.WriteLine("Guest already registered.");
-            }
-        }
-
-        static void ViewGuestsUI()
-        {
-            var guests = DATAPROCESSING.GetGuestList();
-            Console.WriteLine("List of Guests:");
-            if (guests.Count == 0)
-            {
-                Console.WriteLine("No guests registered yet.");
-            }
-            else
-            {
-                foreach (var guest in guests)
-                {
-                    Console.WriteLine(guest.ToString());
-                }
-            }
-        }
-
-        static void RemoveGuestUI()
-        {
-            Console.Write("Enter guest name to remove: ");
-            string nameToRemove = Console.ReadLine();
-
-            if (DATAPROCESSING.RemoveGuest(nameToRemove))
-            {
-                string timeOfExit = DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt");
-                Console.WriteLine($"Guest '{nameToRemove}' exited at {timeOfExit}");
-            }
-            else
-            {
-                Console.WriteLine("Guest not found.");
-            }
-        }
-
-        static void SearchGuestUI()
-        {
-            Console.Write("Enter guest name to search: ");
-            string nameToSearch = Console.ReadLine();
-
-            var guest = DATAPROCESSING.SearchGuest(nameToSearch);
-
-            if (guest != null)
-            {
-                Console.WriteLine($"Guest found: {guest.ToString()}");
-            }
-            else
-            {
-                Console.WriteLine($"Guest '{nameToSearch}' not found.");
-            }
-        }
-
-        static void Exit()
-        {
-            Console.Write("Confirm exit (press enter): ");
-            string exit = Console.ReadLine();
-
-            if (!string.IsNullOrWhiteSpace(exit))
-            {
-                Console.WriteLine("Exiting... Goodbye!");
-            }
-            else
-            {
-                Console.WriteLine("Exiting without confirmation.");
-            }
-        }
+            Console.WriteLine();
+        } while (choice != "0");
     }
 }

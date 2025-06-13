@@ -1,68 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
 using ClassLibrary1;
 
 namespace DataLayer
 {
-    public class GuestDataService
+    public class DLMMO
     {
-        private readonly string jsonFilePath = "guestData.json";
-        private readonly string textFilePath = "guestData.txt";
-        private List<Guest> guests = new();
+        private readonly InMemoryGuestStorage inMemory = new();
+        private readonly GuestDataService json = new();
+        private readonly GuestTextFileService textFile = new();
 
-        public GuestDataService()
+        public bool Register(string name)
         {
-            LoadGuestsFromJson();
-        }
-
-        private void LoadGuestsFromJson()
-        {
-            if (File.Exists(jsonFilePath))
+            bool added = inMemory.AddGuest(name);
+            if (added)
             {
-                string jsonData = File.ReadAllText(jsonFilePath);
-                guests = JsonSerializer.Deserialize<List<Guest>>(jsonData) ?? new List<Guest>();
+                var guest = inMemory.FindGuest(name);
+                json.LogGuest(guest);
+                textFile.LogGuest(guest);
             }
+            return added;
         }
 
-        private void SaveGuestsToJson()
+        public bool Exit(string name)
         {
-            string jsonData = JsonSerializer.Serialize(guests, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(jsonFilePath, jsonData);
-        }
-
-        private void SaveGuestsToTextFile()
-        {
-            File.WriteAllLines(textFilePath, guests.Select(g => g.Name));
-        }
-
-        public void AddGuest(Guest guest)
-        {
-            if (!Exists(guest.Name))
-            {
-                guests.Add(guest);
-                SaveGuestsToJson();
-                SaveGuestsToTextFile();
-            }
-        }
-
-        public bool RemoveGuest(string name)
-        {
-            var guest = guests.FirstOrDefault(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            var guest = inMemory.FindGuest(name);
             if (guest != null)
             {
-                guests.Remove(guest);
-                SaveGuestsToJson();
-                SaveGuestsToTextFile();
-                return true;
+                guest.TimeOut = DateTime.Now;
+                bool removed = inMemory.RemoveGuest(name);
+                if (removed)
+                {
+                    json.LogExit(guest);     
+                    textFile.LogExit(guest); 
+                }
+                return removed;
             }
             return false;
         }
 
-        public List<Guest> GetAllGuests() => new List<Guest>(guests);
-        public Guest FindGuest(string name) => guests.FirstOrDefault(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        public bool Exists(string name) => guests.Any(g => g.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        public Guest Search(string name) => inMemory.FindGuest(name);
+        public bool Exists(string name) => inMemory.Exists(name);
+        public List<Guest> GetAll() => inMemory.GetAllGuests();
     }
 }

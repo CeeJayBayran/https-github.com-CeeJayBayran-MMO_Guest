@@ -1,21 +1,23 @@
-﻿using System;
-
-namespace ClassLibrary1
+﻿namespace ClassLibrary1
 {
     public class Guest
     {
         public string Name { get; set; }
+        public string Role { get; set; }
         public DateTime TimeIn { get; set; }
-
-        public Guest(string name)
+        public DateTime? TimeOut { get; set; } // Common po 
+        public Guest() { }
+        public Guest(string name, string role)
         {
             Name = name;
+            Role = role;
             TimeIn = DateTime.Now;
         }
 
         public override string ToString()
         {
-            return $"{Name} (Entered: {TimeIn})";
+            string exitInfo = TimeOut.HasValue ? $" | Exited: {TimeOut}" : "";
+            return $"{Name} - {Role} (Entered: {TimeIn}{exitInfo})";
         }
     }
 }

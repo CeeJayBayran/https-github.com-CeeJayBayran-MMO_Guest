@@ -1,23 +1,17 @@
 ﻿using System.Collections.Generic;
 using ClassLibrary1;
+using DataLayer;
 
 namespace Business_Logic
 {
-    public static class DATAPROCESSING
+    public class BLMMO
     {
-        public static void RegisterGuest(string guestName)
-        {
-            if (!string.IsNullOrWhiteSpace(guestName) && !GuestDataService.Exists(guestName))
-            {
-                var newGuest = new Guest(guestName);
-                GuestDataService.AddGuest(newGuest);
-            }
-        }
+        private readonly DLMMO data = new();
 
-        public static List<Guest> GetGuestList() => GuestDataService.GetAllGuests();
-
-        public static bool RemoveGuest(string name) => GuestDataService.DeleteGuest(name);
-
-        public static Guest SearchGuest(string name) => GuestDataService.FindGuest(name);
+        public bool Register(string name) => data.Register(name);
+        public bool Exit(string name) => data.Exit(name);
+        public Guest Search(string name) => data.Search(name);
+        public bool Exists(string name) => data.Exists(name);
+        public List<Guest> AllGuests() => data.GetAll();
     }
 }
