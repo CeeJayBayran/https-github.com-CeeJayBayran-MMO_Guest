@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Program.cs~RF36af1a82.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BusinessMMO\BusinessMMO.csproj" />
   </ItemGroup>
 

@@ -1,23 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using ClassLibrary1;
+using DataLayer;
+using DataMMO.DataLayer;
 
 namespace DataLayer
 {
     public class DLMMO
-    {
-        private readonly InMemoryGuestStorage inMemory = new();
-        private readonly GuestDataService json = new();
-        private readonly GuestTextFileService textFile = new();
-
+    { // AND IT HAS THIS IN MEMORY LINE BECAUSE THIS WILL HELP TO GET THE INFO OF THOSE DATA OR MEMBERS THAT ARE ALLOWEED//
+        private readonly InMemoryService inMemory = new();
+        private readonly Json json = new();       
+        private readonly TextFile text = new();     
+        private readonly DBMillionaireOrg db = new();
+        //AGAIN THIS IS ALSO FOR JSON DATABSE SQL AND TEXFILE TO WORK AND THIS MUST BE HERE DEFINITELY//
         public bool Register(string name)
         {
             bool added = inMemory.AddGuest(name);
             if (added)
             {
                 var guest = inMemory.FindGuest(name);
-                json.LogGuest(guest);
-                textFile.LogGuest(guest);
+                json.Register(guest.Name, guest.Role); 
+                text.Register(guest.Name, guest.Role); 
+                db.Register(guest.Name, guest.Role);  
             }
             return added;
         }
@@ -25,17 +29,18 @@ namespace DataLayer
         public bool Exit(string name)
         {
             var guest = inMemory.FindGuest(name);
-            if (guest != null)
+            if (guest == null) return false;
+
+            guest.TimeOut = DateTime.Now;
+
+            if (inMemory.RemoveGuest(name))
             {
-                guest.TimeOut = DateTime.Now;
-                bool removed = inMemory.RemoveGuest(name);
-                if (removed)
-                {
-                    json.LogExit(guest);     
-                    textFile.LogExit(guest); 
-                }
-                return removed;
+                json.ExitGuest(name);
+                text.ExitGuest(name);
+                db.ExitGuest(name);
+                return true;
             }
+
             return false;
         }
 

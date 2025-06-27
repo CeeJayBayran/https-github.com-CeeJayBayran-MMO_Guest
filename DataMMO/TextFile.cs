@@ -2,23 +2,46 @@
 using System.Collections.Generic;
 using System.IO;
 using ClassLibrary1;
+using DataMMO.DataLayer;
 
 namespace DataLayer
-{
-    public class GuestTextFileService  //  The TextFile part po ehhehhehhe//
+{//TEXTFILE//
+    public class TextFile : IMMO
     {
-        private readonly string textFilePath = "guestLog.txt";
+        private readonly string logFile = "guestLog.txt";
 
-        public void LogGuest(Guest guest)
+        public bool Register(string name, string role)
         {
-            var line = $"{guest.Name} - {guest.Role} entered at {guest.TimeIn}";
-            File.AppendAllLines(textFilePath, new[] { line });
-        }
-        public void LogExit(Guest guest)
-        {
-            var line = $"{guest.Name} - {guest.Role} exited at {guest.TimeOut}";
-            File.AppendAllLines(textFilePath, new[] { line });
+            DateTime timeIn = DateTime.Now;
+            string logEntry = $"{name} - {role} entered at {timeIn}";
+            File.AppendAllLines(logFile, new[] { logEntry });
+            return true;
         }
 
+        public bool ExitGuest(string name)
+        {
+            DateTime timeOut = DateTime.Now;
+            string logExit = $"{name} exited at {timeOut}";
+            File.AppendAllLines(logFile, new[] { logExit });
+            return true;
+        }
+
+        public bool Exists(string name)
+        {
+            
+            return false;
+        }
+
+        public Guest? SearchGuest(string name)
+        {
+           
+            return null;
+        }
+
+        public List<Guest> GetAllGuests()
+        {
+        
+            return new List<Guest>();
+        }
     }
 }

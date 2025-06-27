@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ClassLibrary1;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DataMMO
+namespace DataMMO. DataLayer
 {
-    public  interface IMMO
+    public interface IMMO
     {
-        List <Guest> GetAllGuests();
-        void RegisterGuest(Guest guest);
-        void ExitGuest(Guest guest);
+        List<Guest> GetAllGuests();
+        Guest SearchGuest(string name);
+        bool Register(string name , string role);
+        bool ExitGuest(string name);
+        bool Exists(string name);
     }
 }

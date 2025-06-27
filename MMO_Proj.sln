@@ -10,6 +10,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataMMO", "DataMMO\DataMMO.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonMMO", "CommonMMO\CommonMMO.csproj", "{A7D4A7D6-4317-4D2D-B98C-EAAAF4FCFC83}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MMOGUI", "MMOGUI\MMOGUI.csproj", "{4B481089-F064-4443-96C5-447DA461982D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MMOAPI", "MMOAPI\MMOAPI.csproj", "{E9D24ACD-8D4A-43C3-AFE4-B464085D35F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +36,14 @@ Global
 		{A7D4A7D6-4317-4D2D-B98C-EAAAF4FCFC83}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7D4A7D6-4317-4D2D-B98C-EAAAF4FCFC83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7D4A7D6-4317-4D2D-B98C-EAAAF4FCFC83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B481089-F064-4443-96C5-447DA461982D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B481089-F064-4443-96C5-447DA461982D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B481089-F064-4443-96C5-447DA461982D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B481089-F064-4443-96C5-447DA461982D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9D24ACD-8D4A-43C3-AFE4-B464085D35F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9D24ACD-8D4A-43C3-AFE4-B464085D35F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9D24ACD-8D4A-43C3-AFE4-B464085D35F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9D24ACD-8D4A-43C3-AFE4-B464085D35F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

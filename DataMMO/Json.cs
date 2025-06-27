@@ -1,46 +1,82 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
 using ClassLibrary1;
-                           // Malaking ipikto sa buston siltiks ang pagkawala ni jison titum //
+using DataMMO.DataLayer;
+
 namespace DataLayer
 {
-    public class GuestDataService  // This is my Json Part po hehhhehe//
+    public class Json : IMMO
     {
-        private readonly string jsonFilePath = "guestData.json";
+        private readonly string filePath = "guestData.json";
         private List<Guest> guests = new();
 
-        public void LogGuest(Guest guest)
+        private void LoadGuests()
         {
-            LoadFromFile();
-            guests.Add(guest);
-            SaveToFile();
-        }
-
-        private void LoadFromFile()
-        {
-            if (File.Exists(jsonFilePath))
+           if (File.Exists(filePath))
             {
-                var json = File.ReadAllText(jsonFilePath);
-                guests = JsonSerializer.Deserialize<List<Guest>>(json) ?? new();
+           string content = File.ReadAllText(filePath);
+           var data = JsonSerializer.Deserialize<List<Guest>>(content);
+           if (data != null)
+           guests = data;
             }
         }
-        public void LogExit(Guest guest)
+
+        private void SaveGuests()
         {
-            LoadFromFile();
-            guests.Add(new Guest(guest.Name, guest.Role)
-            {
-                TimeIn = guest.TimeIn, //Time In Time Out
-                TimeOut = guest.TimeOut
-            });
-            SaveToFile();
+            string content = JsonSerializer.Serialize(guests, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(filePath, content);
         }
 
-        private void SaveToFile()
+        public bool Register(string name, string role)
         {
-            var json = JsonSerializer.Serialize(guests, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(jsonFilePath, json);
+            LoadGuests();
+
+            var guest = new Guest
+            {
+                Name = name,
+                Role = role,
+                TimeIn = DateTime.Now
+            };
+
+            guests.Add(guest);
+            SaveGuests();
+            return true;
+        }
+
+        public bool ExitGuest(string name)
+        {
+            LoadGuests();
+
+            var guest = guests.LastOrDefault(g => g.Name == name && g.TimeOut == null);
+            if (guest != null)
+            {
+           guest.TimeOut = DateTime.Now;
+           SaveGuests();
+           return true;
+            }
+
+            return false;
+        }
+
+        public bool Exists(string name)
+        {
+            LoadGuests();
+            return guests.Any(g => g.Name == name);
+        }
+
+        public Guest? SearchGuest(string name)
+        {
+            LoadGuests();
+            return guests.LastOrDefault(g => g.Name == name);
+        }
+
+        public List<Guest> GetAllGuests()
+        {
+            LoadGuests();
+            return guests;
         }
     }
 }
