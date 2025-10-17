@@ -1,5 +1,6 @@
 ﻿using Business_Logic;
 using ClassLibrary1;
+using DataMMO.DataLayer;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MMOAPI.Controllers
@@ -9,6 +10,7 @@ namespace MMOAPI.Controllers
     public class MMOController : Controller
     {
         private readonly BLMMO _bl = new BLMMO();
+        private readonly  DBMillionaireOrg db = new DBMillionaireOrg();
 
         //MY API CODE FOR CONTROLLERS //
         [HttpGet]

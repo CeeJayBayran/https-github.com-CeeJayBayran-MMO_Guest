@@ -14,7 +14,7 @@
             Name = name;
             Role = role;
         }
-        //JUST PUT THIS JUST IN CASE THE DATE TIME IN AND TIME OUT IN THE UPPER PART DID NOT WORKED WELL//
+        //THis thing is just only for case that if the date and time did not worked//
         public override string ToString()
         {
             string exit = TimeOut.HasValue ? $" | Exited: {TimeOut}" : "";

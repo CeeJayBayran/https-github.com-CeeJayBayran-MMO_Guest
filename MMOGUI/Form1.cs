@@ -1,17 +1,18 @@
-
-
-    using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Linq;
-using ClassLibrary1;
-using DataMMO.DataLayer;
+using BusinessMMO;             
+using ClassLibrary1;     
+using CommonMMO;
+using DataMMO.DataLayer;         
+
 namespace MMOGUI
 {
     public partial class Form1 : Form
-    {// THIS PART WORKS FOR THE CONNECTION OF THIS FORM TO IN DB MILLIONARE ORG //
+    {
         private readonly DBMillionaireOrg db = new DBMillionaireOrg();
+
         private readonly Dictionary<string, string> allowedGuests = new()
         {
             { "Trench Mauser", "CEO, Mauser Global Logistics" },
@@ -39,67 +40,42 @@ namespace MMOGUI
         public Form1()
         {
             InitializeComponent();
-
         }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
+        private void label1_Click(object sender, EventArgs e) { }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            label1.Text = "MILLIONAIRE MINDS ORGANIZATION";
-            label1.Font = new Font("Onyx", 48, FontStyle.Italic);
-            label1.ForeColor = Color.White;
-            label1.BackColor = Color.Transparent;
-            label1.TextAlign = ContentAlignment.MiddleCenter;
-            label1.AutoSize = false;
-            label1.Width = this.Width;
-            label1.Height = 60;
-            label1.Location = new Point(0, 10);
-            label1.BorderStyle = BorderStyle.None;
-
-            label2.Text = "ENTER NAME :";
-            label2.Font = new Font("Bodoni MT", 11, FontStyle.Regular);
-            label2.ForeColor = Color.White;
-            label2.BackColor = Color.Transparent;
-            label2.AutoSize = true;
-
-            textBox1.Font = new Font("Bodoni MT", 10, FontStyle.Regular);
-            textBox1.BackColor = Color.Black;
-            textBox1.ForeColor = Color.White;
-            textBox1.Location = new Point(140, 130);
-            textBox1.Size = new Size(190, 30);
-            textBox1.Text = " ";
-            textBox1.ReadOnly = false;
-
             RefreshGuestList();
-
         }
+
         private void RefreshGuestList()
         {
             Members.Items.Clear();
             foreach (var g in db.GetAllGuests())
                 Members.Items.Add($"{g.Name} - {g.Role}");
-
-
-
         }
-
         private void button1_Click(object sender, EventArgs e)
         {
             string name = textBox1.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                MessageBox.Show("Please enter a name.", "Missing Name", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             if (!allowedGuests.ContainsKey(name))
             {
                 MessageBox.Show("You are not allowed to enter this organization.", "Access Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+
             if (db.Exists(name))
             {
                 MessageBox.Show("You are already registered in the organization.", "Registration Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
             string role = allowedGuests[name];
             if (db.Register(name, role))
             {
@@ -110,35 +86,51 @@ namespace MMOGUI
             {
                 MessageBox.Show("Failed to register. Please try again.", "Registration Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            textBox1.Text = " ";
 
+      
+            textBox1.SelectAll();
         }
-
         private void button2_Click(object sender, EventArgs e)
         {
             RefreshGuestList();
             int count = Members.Items.Count;
             MessageBox.Show($"Total Guests Present: {count}", "Guest Count", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
         }
 
+       
         private void button3_Click(object sender, EventArgs e)
         {
             string name = textBox1.Text.Trim();
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                MessageBox.Show("Please enter a name to search.", "Missing Name", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             var guest = db.SearchGuest(name);
             if (guest != null)
             {
-                MessageBox.Show($"{guest.Name}- {guest.Role}\nTimeIn In: {guest.TimeIn}", "Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"{guest.Name} - {guest.Role}\nTime In: {guest.TimeIn}", "Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
                 MessageBox.Show("Guest not found.", "Search Result", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+
+            //This is for not erasing or not be gone the name in the textbox after registering or exit
+            textBox1.Clear();
+            textBox1.Focus();
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
             string name = textBox1.Text.Trim();
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                MessageBox.Show("Please enter a name to exit.", "Missing Name", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             if (db.ExitGuest(name))
             {
                 MessageBox.Show($"Goodbye {name}, you have exited the organization.", "Exit Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -148,9 +140,59 @@ namespace MMOGUI
             {
                 MessageBox.Show("Failed to exit. Please try again.", "Exit Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            textBox1.Text = " ";
+
+
+            textBox1.SelectAll();
         }
 
-       
+        // SEND EMAIL this is for the part wherein theuser will click the button to send an email to mailtrap
+        private void btnSendEmail_Click(object sender, EventArgs e)
+        {
+            string name = textBox1.Text.Trim();
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                MessageBox.Show("Please enter a name first.", "Missing Name", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // I have this unique function wherein only the authorized members of my organization who can only join or eenter and send notif 
+            if (!allowedGuests.ContainsKey(name))
+            {
+                MessageBox.Show(" Only authorized members can send notifications.", "Access Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // asking email of the recipient or the one who has the mailtrap for sending notification
+            string recipient = Microsoft.VisualBasic.Interaction.InputBox("Enter recipient email address:", "Send Email", "test@example.com");
+            if (string.IsNullOrWhiteSpace(recipient))
+            {
+                MessageBox.Show("No recipient entered.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Notification part in mailtrap if successful
+            EmailInfo info = new EmailInfo
+            {
+                To = recipient,
+                Subject = "MMO Organization Notification",
+                Body = $"Dear {name},\n\nYour activity has been logged in the MMO system.\n\nRegards,\nMillionaire Minds Organization"
+            };
+
+            try
+            {
+                // This part was use to make a connection with my BLMMO
+                EmailService emailService = new EmailService();
+                emailService.SendEmail(name,info); 
+
+                MessageBox.Show(" Email successfully sent via Mailtrap!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error sending email: " + ex.Message, "Email Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            textBox1.Clear();
+            textBox1.Focus();
+        }
     }
 }
