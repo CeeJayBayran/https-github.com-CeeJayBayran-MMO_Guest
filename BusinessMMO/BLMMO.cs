@@ -7,7 +7,7 @@ using BusinessMMO;
 using CommonMMO; // For me to use Emailinfo and EmailService
 
 namespace Business_Logic
-{
+{//
     public class BLMMO
     {
         private readonly DLMMO data = new DLMMO();

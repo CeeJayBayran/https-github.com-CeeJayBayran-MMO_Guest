@@ -7,7 +7,7 @@ using ClassLibrary1;
 using CommonMMO;
 using DataMMO.DataLayer;         
 
-namespace MMOGUI
+namespace MMOGUI//
 {
     public partial class Form1 : Form
     {

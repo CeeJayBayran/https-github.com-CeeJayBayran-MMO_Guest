@@ -9,7 +9,7 @@
 
         /// <summary>
         /// Clean up any resources being used.
-        /// </summary>
+        /// </summary>//
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
