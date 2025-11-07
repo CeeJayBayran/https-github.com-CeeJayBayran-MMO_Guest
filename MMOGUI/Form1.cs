@@ -5,7 +5,8 @@ using System.Windows.Forms;
 using BusinessMMO;             
 using ClassLibrary1;     
 using CommonMMO;
-using DataMMO.DataLayer;         
+using DataMMO.DataLayer;
+
 
 namespace MMOGUI//
 {
@@ -146,6 +147,7 @@ namespace MMOGUI//
         }
 
         // SEND EMAIL this is for the part wherein theuser will click the button to send an email to mailtrap
+
         private void btnSendEmail_Click(object sender, EventArgs e)
         {
             string name = textBox1.Text.Trim();
@@ -155,14 +157,12 @@ namespace MMOGUI//
                 return;
             }
 
-            // I have this unique function wherein only the authorized members of my organization who can only join or eenter and send notif 
             if (!allowedGuests.ContainsKey(name))
             {
-                MessageBox.Show(" Only authorized members can send notifications.", "Access Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Only authorized members can send notifications.", "Access Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            // asking email of the recipient or the one who has the mailtrap for sending notification
             string recipient = Microsoft.VisualBasic.Interaction.InputBox("Enter recipient email address:", "Send Email", "test@example.com");
             if (string.IsNullOrWhiteSpace(recipient))
             {
@@ -170,21 +170,24 @@ namespace MMOGUI//
                 return;
             }
 
-            // Notification part in mailtrap if successful
+           
             EmailInfo info = new EmailInfo
             {
                 To = recipient,
                 Subject = "MMO Organization Notification",
-                Body = $"Dear {name},\n\nYour activity has been logged in the MMO system.\n\nRegards,\nMillionaire Minds Organization"
+                Body = $"Dear {name},\n\nYour participation has already been acknowledged. Thank you, Boss.\n\nRegards,\nMillionaire Minds Organization"
             };
 
             try
             {
-                // This part was use to make a connection with my BLMMO
+               
                 EmailService emailService = new EmailService();
-                emailService.SendEmail(name,info); 
+                bool sent = emailService.SendEmail(name, info);
 
-                MessageBox.Show(" Email successfully sent via Mailtrap!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (sent)
+                    MessageBox.Show("Email successfully sent via Mailtrap!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                else
+                    MessageBox.Show("Failed to send email. Name might not exist in in-memory list.", "Send Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
@@ -194,5 +197,6 @@ namespace MMOGUI//
             textBox1.Clear();
             textBox1.Focus();
         }
+
     }
 }
